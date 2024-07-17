@@ -2,10 +2,10 @@
 
 ## Data
 
-The bulk RNA sequence data were collected from this study
+The bulk RNA sequence data of sorted monocytes, derived from six patiens with COVID-19 and three healty donars from this study.
 https://www.nature.com/articles/s41590-020-00832-x 
 
-This will download the SRA files and convert them in fastq.gz 
+This will download the SRA files using parallel-fastq-dump and convert them in fastq.gz 
 ```
 parallel-fastq-dump --sra-id SRR12926701 SRR12926702 SRR12926703 SRR12926704 SRR12926705 SRR12926706 SRR12926707 SRR12926708 SRR12926709 --threads 4 --outdir output/ --split-files --gzip
 ```
@@ -26,7 +26,8 @@ gunzip *.gz
 hisat2-build hg38.fa hg38_index
 ```
 
-Alignment with hisat2
+This will align the samples with indexed ref genome using hisat2 and convert the sam file to bam file using samtools.
+Later sam files and bam files were removed and sorted bam files were kept for later analysis.
 ```
 #!/bin/bash
 
@@ -69,5 +70,13 @@ for sample in "${samples[@]}"; do
   rm "$sam_file" "$bam_file" Rawdata/"${sample}_1.fastq" Rawdata/"${sample}_2.fastq"
 
 done
+```
 
+## Counting reads
+
+The featureCounts is used for counting the number of reads that align to genomic features such as genes, exons, or other genomic regions. It is a part of the Subread package, developed by the WEHI Bioinformatics team.
+It takes bam files as input and Uses a gene annotation file (GTF/GFF format) that defines the genomic features to be counted (e.g., gene exons).
+
+```
+featureCounts -p -T 8 -a reference/gh38.ensGene.gtf -t exon -g gene_id -o counts_matrix.txt bam_files/*sorted.bam 
 ```
