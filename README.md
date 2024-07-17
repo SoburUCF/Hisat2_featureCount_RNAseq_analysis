@@ -65,4 +65,9 @@ for sample in "${samples[@]}"; do
   samtools index "$sorted_bam_file" || { echo "BAM indexing failed for $sample"; exit 1; }
 
   # Clean up intermediate files
+  
+  rm "$sam_file" "$bam_file" Rawdata/"${sample}_1.fastq" Rawdata/"${sample}_2.fastq"
+
+done
+
 ```
